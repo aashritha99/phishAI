@@ -16,3 +16,12 @@ yarn-error.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# CSV files
+*.csv
+
+# Kaggle API key
+.kaggle/kaggle.json
+
+*.zip
+*.json
