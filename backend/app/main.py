@@ -1,14 +1,19 @@
 from fastapi import FastAPI
-from app.routes import root_routes, predict_routes
+from fastapi.middleware.cors import CORSMiddleware
+from app.routes.predict_routes import router as predict_router
 
 app = FastAPI(title="PishAI Backend")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['http://localhost:5173'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# ✅ Include routes
-app.include_router(root_routes.router)
-app.include_router(predict_routes.router)
+app.include_router(predict_router, prefix="/predict", tags=["Predict"])
 
-@app.on_event("startup")
-async def startup_event():
-    print("🚀 PishAI API running successfully!")
-
+@app.get("/")
+def root():
+    return {"Message ": "Welcome to the PishAI Backend! Use the /predict endpoint to classify emails and URLs."}

@@ -11,9 +11,17 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 # =====================================================
 # PATH SETUP
 # =====================================================
-BASE_DIR = os.getcwd()
-FEATURES_DIR = os.path.join(BASE_DIR, "dataset", "features")
-MODELS_DIR = os.path.join(BASE_DIR, "models")
+# This gets /absolute/path/to/PishAI/backend/scripts
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# This gets /absolute/path/to/PishAI/backend
+BACKEND_DIR = os.path.dirname(CURRENT_DIR)
+
+# Go up one level to reach /absolute/path/to/PishAI
+PROJECT_ROOT = os.path.dirname(BACKEND_DIR)
+
+FEATURES_DIR = os.path.join(PROJECT_ROOT, "dataset", "features")
+MODELS_DIR = os.path.join(PROJECT_ROOT, "models")
 os.makedirs(MODELS_DIR, exist_ok=True)
 
 # =====================================================
@@ -40,7 +48,6 @@ def print_metrics(y_true, y_pred, model_name, dataset_name):
     print(f"\n📊 {Fore.YELLOW}{model_name} ({dataset_name}) Metrics{Style.RESET_ALL}")
     print(f"Accuracy: {acc}, Precision: {prec}, Recall: {rec}, F1: {f1}\n", flush=True)
 
-    # Save full classification report
     report = classification_report(y_true, y_pred)
     report_file = os.path.join(MODELS_DIR, f"{dataset_name.lower()}_{model_name.lower()}_report.txt")
     with open(report_file, "w") as f:

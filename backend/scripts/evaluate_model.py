@@ -25,31 +25,25 @@ warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 def evaluate_model(model_name, test_features_path, model_path, vectorizer_path=None, output_prefix="model"):
     print(f"\n🔹 Evaluating {model_name} Model...")
 
-    # Load test features
     if not os.path.exists(test_features_path):
         raise FileNotFoundError(f"❌ Test features not found at {test_features_path}")
     X_test, y_test = joblib.load(test_features_path)
 
-    # Load model
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"❌ Model not found at {model_path}")
     model = joblib.load(model_path)
 
-    # Only transform if X_test is raw text (pandas Series) and vectorizer is provided
     if vectorizer_path and os.path.exists(vectorizer_path) and isinstance(X_test, pd.Series):
         vectorizer = joblib.load(vectorizer_path)
         X_test = vectorizer.transform(X_test)
 
-    # Predict
     y_pred = model.predict(X_test)
 
-    # Evaluate metrics in %
     accuracy = accuracy_score(y_test, y_pred) * 100
     precision = precision_score(y_test, y_pred, average='weighted', zero_division=0) * 100
     recall = recall_score(y_test, y_pred, average='weighted', zero_division=0) * 100
     f1 = f1_score(y_test, y_pred, average='weighted', zero_division=0) * 100
 
-    # Print metrics
     print(f"\n📊 {model_name} Model Results:")
     print("----------------------------------")
     print(f"✅ Accuracy : {accuracy:.2f}%")
@@ -57,11 +51,9 @@ def evaluate_model(model_name, test_features_path, model_path, vectorizer_path=N
     print(f"✅ Recall   : {recall:.2f}%")
     print(f"✅ F1-Score : {f1:.2f}%")
 
-    # Classification Report
     print("\n📋 Classification Report:")
     print(classification_report(y_test, y_pred))
 
-    # Confusion Matrix
     labels = sorted(list(set(y_test)))
     cm = confusion_matrix(y_test, y_pred, labels=labels)
     plt.figure(figsize=(6, 5))
@@ -78,7 +70,6 @@ def evaluate_model(model_name, test_features_path, model_path, vectorizer_path=N
     plt.close()
     print(f"📁 Confusion matrix saved to: {cm_path}")
 
-    # Save metrics to JSON
     metrics = {
         "model": model_name,
         "accuracy": round(accuracy, 2),
