@@ -22,6 +22,9 @@ Thumbs.db
 
 # Kaggle API key
 .kaggle/kaggle.json
-
+*.txt
 *.zip
 *.json
+*.pkl
+# Ignore evaluation outputs
+outputs/
