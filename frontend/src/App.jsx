@@ -20,10 +20,14 @@ function App() {
       >
         {/* Navbar */}
         <nav
-          className={`shadow-md ${
-            theme === "dark" ? "bg-gray-800 text-white" : "bg-blue-600 text-white"
-          }`}
-        >
+  className={`shadow-md rounded-3xl ${
+    theme === "dark"
+      ? "bg-gradient-to-r from-[#2e026d] via-[#3b0764] to-[#581c87] text-white shadow-xl"
+      : "bg-gradient-to-r dark:from-[#3b0764] dark:via-[#4c1d95] dark:to-[#1e1b4b] text-white"
+  }`}
+>
+
+
           <div className="container mx-auto px-6 py-4 flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <img src="/logo2.png" alt="PhishAI Logo" className="w-18 h-10" />
