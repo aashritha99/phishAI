@@ -5,6 +5,7 @@ import URLChecker from "./pages/URLChecker";
 import EmailChecker from "./pages/EmailChecker";
 import History from "./pages/History";
 
+
 function App() {
   const [theme, setTheme] = useState("light");
 
@@ -59,12 +60,18 @@ function App() {
               </Link>
 
               {/* Theme Toggle Button */}
-              <button
-                onClick={toggleTheme}
-                className="ml-4 px-3 py-1 rounded-lg bg-white/20 hover:bg-white/30 transition"
-              >
-                {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
-              </button>
+             <button
+  onClick={toggleTheme}
+  className="ml-4 relative inline-flex items-center justify-center w-12 h-6 bg-white/20 backdrop-blur-md rounded-full transition-all duration-300 hover:bg-white/30"
+>
+  <span
+    className={`absolute left-1 top-1 w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
+      theme === "dark" ? "translate-x-6 bg-yellow-400" : "translate-x-0 bg-gray-100"
+    }`}
+  ></span>
+  <span className="sr-only">Toggle Theme</span>
+</button>
+
             </div>
           </div>
         </nav>

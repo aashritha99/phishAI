@@ -15,6 +15,7 @@ export default function Home() {
       <p className="text-gray-700 mb-6">
         AI-powered phishing URL and email detector to keep your digital life safe.
       </p>
+      
       <div className="space-x-4">
         <Link
           to="/url-checker"
@@ -29,6 +30,7 @@ export default function Home() {
           Check Email
         </Link>
       </div>
+      
     </motion.div>
   );
 }
