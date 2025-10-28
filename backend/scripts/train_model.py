@@ -71,17 +71,17 @@ def train_email_models():
     X_train, y_train = joblib.load(email_train_path)
     X_test, y_test = joblib.load(email_test_path)
 
-    # 🧠 Random Forest
+    # 🧠 Random Forest - ADDING class_weight='balanced'
     progress_bar("Training Random Forest (Email)", total_steps=15, delay=0.15)
-    rf_email = RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1)
+    rf_email = RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1, class_weight='balanced')
     rf_email.fit(X_train, y_train)
     y_pred_rf = rf_email.predict(X_test)
     joblib.dump(rf_email, os.path.join(MODELS_DIR, "email_rf_model.pkl"))
     print_metrics(y_test, y_pred_rf, "Random Forest", "Email")
 
-    # 🧠 Logistic Regression
+    # 🧠 Logistic Regression - ADDING class_weight='balanced'
     progress_bar("Training Logistic Regression (Email)", total_steps=15, delay=0.15)
-    lr_email = LogisticRegression(max_iter=1000, n_jobs=-1)
+    lr_email = LogisticRegression(max_iter=1000, n_jobs=-1, class_weight='balanced')
     lr_email.fit(X_train, y_train)
     y_pred_lr = lr_email.predict(X_test)
     joblib.dump(lr_email, os.path.join(MODELS_DIR, "email_lr_model.pkl"))
@@ -106,17 +106,17 @@ def train_url_models():
     X_train, y_train = joblib.load(url_train_path)
     X_test, y_test = joblib.load(url_test_path)
 
-    # 🧠 Random Forest
+    # 🧠 Random Forest - ADDING class_weight='balanced'
     progress_bar("Training Random Forest (URL)", total_steps=15, delay=0.15)
-    rf_url = RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1)
+    rf_url = RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1, class_weight='balanced')
     rf_url.fit(X_train, y_train)
     y_pred_rf = rf_url.predict(X_test)
     joblib.dump(rf_url, os.path.join(MODELS_DIR, "url_rf_model.pkl"))
     print_metrics(y_test, y_pred_rf, "Random Forest", "URL")
 
-    # 🧠 Logistic Regression
+    # 🧠 Logistic Regression - ADDING class_weight='balanced'
     progress_bar("Training Logistic Regression (URL)", total_steps=15, delay=0.15)
-    lr_url = LogisticRegression(max_iter=1000, n_jobs=-1)
+    lr_url = LogisticRegression(max_iter=1000, n_jobs=-1, class_weight='balanced')
     lr_url.fit(X_train, y_train)
     y_pred_lr = lr_url.predict(X_test)
     joblib.dump(lr_url, os.path.join(MODELS_DIR, "url_lr_model.pkl"))
