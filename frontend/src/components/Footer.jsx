@@ -20,21 +20,14 @@ export default function Footer() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-          className="flex flex-col md:flex-row justify-between items-center md:items-start gap-8 mb-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8"
         >
           {/* Left: Logo + Tagline */}
-          <div className="flex flex-col items-center md:items-start text-center md:text-left">
+          <div className="flex flex-col">
             <div className="flex items-center space-x-3 mb-2">
               <div className="w-18 h-10 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-xl shadow-md">
- <img src="/logo2.png" alt="PhishAI Logo" className="w-18 h-10" />
+                <img src="/logo2.png" alt="PhishAI Logo" className="w-18 h-10" />
               </div>
-              <span
-                className={`text-2xl font-bold ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
-                }`}
-              >
-               
-              </span>
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               AI-powered protection against phishing threats.
@@ -42,7 +35,7 @@ export default function Footer() {
           </div>
 
           {/* Middle: Quick Links */}
-          <div className="flex flex-col items-center md:items-start space-y-2">
+          <div className="flex flex-col space-y-2">
             <h3 className="font-semibold text-base text-blue-600 dark:text-blue-400">
               Quick Links
             </h3>
@@ -73,7 +66,7 @@ export default function Footer() {
           </div>
 
           {/* Right: Contact Info */}
-          <div className="flex flex-col items-center md:items-start space-y-2">
+          <div className="flex flex-col space-y-2">
             <h3 className="font-semibold text-base text-blue-600 dark:text-blue-400">
               Contact Us
             </h3>
