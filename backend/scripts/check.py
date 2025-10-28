@@ -77,16 +77,18 @@ MODEL_DIR = os.path.join(PROJECT_ROOT, "models" )
 # print("Prediction:", model.predict(random_input))
 # print("Prediction probabilities:", model.predict_proba(random_input))
 
-df=pd.read_csv(os.path.join(PROJECT_ROOT, "dataset", "processed", "urls_train.csv"))
-print(df["CLASS_LABEL"].value_counts(normalize=True))
+# df=pd.read_csv(os.path.join(PROJECT_ROOT, "dataset", "processed", "urls_train.csv"))
+# print(df["CLASS_LABEL"].value_counts(normalize=True))
 
-urls = [
-    "https://google.com",
-    "https://facebook.com",
-    "https://github.com",
-    "https://www.microsoft.com/en-in/",
-    "https://amazon.in"
-]
+# urls = [
+#     "https://google.com",
+#     "https://facebook.com",
+#     "https://github.com",
+#     "https://www.microsoft.com/en-in/",
+#     "https://amazon.in"
+# ]
 
-for url in urls:
-    print(url, "=>", predict(url, "url"))
+# for url in urls:
+#     print(url, "=>", predict(url, "url"))
+
+

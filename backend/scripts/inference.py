@@ -3,6 +3,8 @@ import joblib
 import pandas as pd
 import numpy as np
 from url_feature_extractor import extract_url_features   
+from email_feature_extraction import extract_email_features
+
 
 # ------------------------------
 # Paths
@@ -48,18 +50,30 @@ LABEL_MAP = {0: "Safe", 1: "Phishing/Malicious"}
 # ------------------------------
 def predict_email(text, model_type="rf"):
     try:
-        X = tfidf_vectorizer.transform([text])
+        # ✅ Step 1: Extract cleaned features
+        features_df = extract_email_features(text)
+        
+        # ✅ Step 2: Vectorize text using trained TF-IDF
+        X = tfidf_vectorizer.transform(features_df["clean_text"])
+        
+        # ✅ Step 3: Select model (RF or LR)
         model = email_rf_model if model_type == "rf" else email_lr_model
-
+        
+        # ✅ Step 4: Get probabilities
         proba = model.predict_proba(X)[0]
         phishing_prob = float(proba[1])
-        pred = 1 if phishing_prob >= 0.7 else 0  # calibrated threshold
-
+        
+        # ✅ Step 5: Apply threshold
+        pred = 1 if phishing_prob >= 0.7 else 0
         confidence = float(round(min(phishing_prob * 100, 99.9), 2))
-
-        print(f"📧 Email raw probs: {np.round(proba, 3)} | phishing_prob: {phishing_prob:.3f} | Label: {LABEL_MAP[pred]}")
-        return {"label": LABEL_MAP[pred], "confidence": confidence}
-
+        
+        print(f"📧 Email raw probs: {proba.round(3)} | phishing_prob: {phishing_prob:.3f} | Label: {LABEL_MAP[pred]}")
+        
+        return {
+            "label": LABEL_MAP[pred],
+            "confidence": confidence
+        }
+    
     except Exception as e:
         return {"label": "Error", "confidence": 0.0, "error": str(e)}
 

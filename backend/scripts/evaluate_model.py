@@ -54,9 +54,6 @@ def evaluate_model(model_name, test_features_path, model_path, vectorizer_path=N
 
     if vectorizer_path and os.path.exists(vectorizer_path) and isinstance(X_test, pd.Series):
         vectorizer = joblib.load(vectorizer_path)
-        # Note: This block seems intended for text data, but joblib.load(emails_test_features.pkl) 
-        # already returns processed features X_test and labels y_test (as seen in feature_engineering.py).
-        # We will keep it as is, but it's important to know X_test should be feature matrix here.
         X_test = vectorizer.transform(X_test) 
 
     y_pred = model.predict(X_test)
