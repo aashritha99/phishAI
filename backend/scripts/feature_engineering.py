@@ -1,5 +1,3 @@
-# scripts/feature_engineering.py
-
 import pandas as pd
 import os
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -44,7 +42,6 @@ def process_email_features():
     X_test = vectorizer.transform(test_texts)
 
     joblib.dump(vectorizer, os.path.join(FEATURES_DIR, "tfidf_vectorizer.pkl"))
-
     joblib.dump((X_train, train_df['label']), os.path.join(FEATURES_DIR, "emails_train_features.pkl"))
     joblib.dump((X_test, test_df['label']), os.path.join(FEATURES_DIR, "emails_test_features.pkl"))
 
@@ -64,6 +61,9 @@ def process_url_features():
 
     X_train = train_df.drop(columns=['CLASS_LABEL'])
     X_test = test_df.drop(columns=['CLASS_LABEL'])
+
+    feature_columns = list(X_train.columns)
+    joblib.dump(feature_columns, os.path.join(FEATURES_DIR, "url_feature_columns.pkl"))
 
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)

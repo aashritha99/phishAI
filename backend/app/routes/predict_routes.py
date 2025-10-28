@@ -6,7 +6,7 @@ router = APIRouter()
 
 class PredictRequest(BaseModel):
     input_data: str
-    input_type: str = "email"  # "email" or "url"
+    input_type: str = ["email", "url"]
 
 class PredictResponse(BaseModel):
     status: str
@@ -34,6 +34,3 @@ def predict_endpoint(payload: PredictRequest):
         raise HTTPException(status_code=500, detail="Model files not found.")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-    result = predict(input_data, input_type)
-    return result
