@@ -92,8 +92,8 @@ MODEL_DIR = os.path.join(PROJECT_ROOT, "models" )
 #     print(url, "=>", predict(url, "url"))
 
 
-from email_feature_extraction import extract_email_features
-from inference import predict_email
+from scripts.email_feature_extraction import extract_email_features
+from scripts.inference import predict_email
 
 emails = [
     "Your package will arrive tomorrow, track here: http://example.com",

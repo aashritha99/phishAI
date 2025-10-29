@@ -2,8 +2,8 @@ import os
 import joblib
 import pandas as pd
 import numpy as np
-from url_feature_extractor import extract_url_features
-from email_feature_extraction import extract_email_features
+from scripts.url_feature_extractor import extract_url_features
+from scripts.email_feature_extraction import extract_email_features
 import warnings
 warnings.filterwarnings("ignore", message="X has feature names")
 
