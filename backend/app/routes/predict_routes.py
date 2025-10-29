@@ -4,33 +4,37 @@ from scripts.inference import predict
 
 router = APIRouter()
 
-class PredictRequest(BaseModel):
-    input_data: str
-    input_type: str = ["email", "url"]
+class EmailRequest(BaseModel):
+    email_text: str
 
-class PredictResponse(BaseModel):
-    status: str
-    label: str
-    confidence: float
+class URLRequest(BaseModel):
+    url: str
 
-@router.post("/", response_model=PredictResponse)
-def predict_endpoint(payload: PredictRequest):
-    try:
-        input_data = payload.input_data
-        input_type = payload.input_type
+@router.post("/email")
+async def predict_email(payload: EmailRequest):
+    email_text= payload.email_text.strip()
 
-        if input_type not in ["email", "url"]:
-            raise HTTPException(status_code=400, detail="Invalid input_type.")
-        
-        result = predict(input_data, input_type)
-
-        return {
-            "status": "success",
-            "label": result['label'],
-            "confidence": result['confidence']
-        }
+    if not email_text:
+        raise HTTPException(status_code=400, detail="Email text cannot be empty.")
     
-    except FileNotFoundError:
-        raise HTTPException(status_code=500, detail="Model files not found.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    result = predict(email_text, input_type="email")
+    return {
+        "status": "success",
+        "label": result['label'],
+        "confidence": result['confidence']
+    }
+
+@router.post("/url")
+async def predict_url(payload: URLRequest):
+    url = payload.url.strip()
+
+    if not url:
+        raise HTTPException(status_code=400, detail="URL cannot be empty.")
+    
+    result = predict(url, input_type="url")
+    return {
+        "status": "success",
+        "label": result['label'],
+        "confidence": result['confidence']
+    }
+
