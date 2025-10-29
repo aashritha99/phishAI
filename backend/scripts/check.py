@@ -92,3 +92,18 @@ MODEL_DIR = os.path.join(PROJECT_ROOT, "models" )
 #     print(url, "=>", predict(url, "url"))
 
 
+from email_feature_extraction import extract_email_features
+from inference import predict_email
+
+emails = [
+    "Your package will arrive tomorrow, track here: http://example.com",
+    "Verify your bank account immediately or it will be blocked.",
+    "Meeting scheduled for 3 PM today, please join on time."
+]
+
+for email in emails:
+    print("\n--- EMAIL SAMPLE ---")
+    print(email)
+    features = extract_email_features(email)
+    print("Feature shape:", features.shape)
+    print(predict_email(email, model_type="rf"))

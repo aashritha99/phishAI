@@ -2,8 +2,10 @@ import os
 import joblib
 import pandas as pd
 import numpy as np
-from url_feature_extractor import extract_url_features   
+from url_feature_extractor import extract_url_features
 from email_feature_extraction import extract_email_features
+import warnings
+warnings.filterwarnings("ignore", message="X has feature names")
 
 
 # ------------------------------
@@ -19,6 +21,7 @@ MODELS_DIR = os.path.join(PROJECT_ROOT, "models")
 TFIDF_VECTORIZER = os.path.join(FEATURES_DIR, "tfidf_vectorizer.pkl")
 URL_SCALER = os.path.join(FEATURES_DIR, "url_scaler.pkl")
 URL_FEATURE_COLUMNS_FILE = os.path.join(FEATURES_DIR, "url_feature_columns.pkl")
+EMAIL_FEATURE_COLUMNS_FILE = os.path.join(FEATURES_DIR, "email_feature_columns.pkl")
 
 # ------------------------------
 # Load assets
@@ -27,6 +30,11 @@ try:
     tfidf_vectorizer = joblib.load(TFIDF_VECTORIZER)
     url_scaler = joblib.load(URL_SCALER)
     URL_FEATURE_COLUMNS = joblib.load(URL_FEATURE_COLUMNS_FILE)
+    EMAIL_FEATURE_COLUMNS = (
+        joblib.load(EMAIL_FEATURE_COLUMNS_FILE)
+        if os.path.exists(EMAIL_FEATURE_COLUMNS_FILE)
+        else None
+    )
     print(f"✅ Loaded TF-IDF, scaler, and {len(URL_FEATURE_COLUMNS)} URL features.")
 except Exception as e:
     print(f"❌ Error loading feature assets: {e}")
@@ -50,39 +58,35 @@ LABEL_MAP = {0: "Safe", 1: "Phishing/Malicious"}
 # ------------------------------
 def predict_email(text, model_type="rf"):
     try:
-        # ✅ Step 1: Extract cleaned features
+        # ✅ Step 1: Extract TF-IDF features as DataFrame
         features_df = extract_email_features(text)
-        
-        # ✅ Step 2: Vectorize text using trained TF-IDF
-        X = tfidf_vectorizer.transform(features_df["clean_text"])
-        
-        # ✅ Step 3: Select model (RF or LR)
+
+        # ✅ Step 2: Align columns if feature list available
+        if EMAIL_FEATURE_COLUMNS is not None:
+            features_df = features_df.reindex(columns=EMAIL_FEATURE_COLUMNS, fill_value=0)
+
+        # ✅ Step 3: Choose model
         model = email_rf_model if model_type == "rf" else email_lr_model
-        
-        # ✅ Step 4: Get probabilities
-        proba = model.predict_proba(X)[0]
+
+        # ✅ Step 4: Predict probabilities
+        proba = model.predict_proba(features_df)[0]
         phishing_prob = float(proba[1])
-        
-        # ✅ Step 5: Apply threshold
+
+        # ✅ Step 5: Apply calibrated threshold
         pred = 1 if phishing_prob >= 0.7 else 0
-        confidence = float(round(min(phishing_prob * 100, 99.9), 2))
-        
-        print(f"📧 Email raw probs: {proba.round(3)} | phishing_prob: {phishing_prob:.3f} | Label: {LABEL_MAP[pred]}")
-        
-        return {
-            "label": LABEL_MAP[pred],
-            "confidence": confidence
-        }
-    
+        confidence = float(round(max(phishing_prob, 1 - phishing_prob) * 100, 2))
+
+        # print(f"📧 Email raw probs: {np.round(proba, 3)} | phishing_prob: {phishing_prob:.3f} | Label: {LABEL_MAP[pred]}")
+        return {"label": LABEL_MAP[pred], "confidence": confidence}
+
     except Exception as e:
         return {"label": "Error", "confidence": 0.0, "error": str(e)}
 
 # ------------------------------
-# URL Prediction (with calibration)
+# URL Prediction
 # ------------------------------
 def predict_url(url_string, model_type="rf"):
     try:
-        # Extract and align features
         df_features = extract_url_features(url_string)
         df_features = df_features.fillna(0)
         df_features = df_features[URL_FEATURE_COLUMNS]
@@ -90,15 +94,11 @@ def predict_url(url_string, model_type="rf"):
         X_scaled = url_scaler.transform(df_features)
         model = url_rf_model if model_type == "rf" else url_lr_model
 
-        # Predict probabilities
         proba = model.predict_proba(X_scaled)[0]
         phishing_prob = float(proba[1])
 
-        # 🔧 Calibrated threshold — avoid false positives
         pred = 1 if phishing_prob >= 0.75 else 0
-        confidence = float(round(min(phishing_prob * 100, 99.9), 2))
-
-        # print(f"Raw probs: {np.round(proba, 3)} | Calibrated phishing_prob: {phishing_prob:.3f} | Final Label: {LABEL_MAP[pred]}")
+        confidence = float(round(max(phishing_prob, 1 - phishing_prob) * 100, 2))
 
         return {"label": LABEL_MAP[pred], "confidence": confidence}
 
@@ -117,7 +117,7 @@ def predict(input_data, input_type="email"):
     else:
         raise ValueError("Invalid input_type. Must be 'email' or 'url'.")
 
-    # Choose higher-confidence result
+    # Return whichever model is more confident
     return rf if rf["confidence"] >= lr["confidence"] else lr
 
 # ------------------------------
@@ -127,8 +127,22 @@ if __name__ == "__main__":
     print("\n--- Inference Test Run ---")
 
     # Email samples
-    email_mal = "Urgent! Your account has been compromised. Click the link to reset your password immediately!"
-    email_legit = "Your Amazon order #112-9982 has been shipped and will be delivered by Monday."
+    email_mal = """Dear Aspirant,
+
+        You’ve just unlocked access to an exclusive PowerBI Masterclass led by Anjali Pandey (Data Scientist, Accenture) — where you’ll learn to build professional dashboards from scratch and earn your verified certificate of completion!
+
+        Session Details :
+
+        📅 Date: Oct 24, 2025
+        ⏰ Time: 7:00 PM
+
+        🎓 Certificate: Yes, available for all attendees
+
+        REGISTER NOW
+        Good Luck !
+
+        Warm regards"""
+    email_legit = "Meeting Reminder: The team sync-up is scheduled for 2:30 PM today on Google Meet.  Please be on time."
     print("📧 Email (Malicious):", predict(email_mal, "email"))
     print("📧 Email (Legit):", predict(email_legit, "email"))
 
