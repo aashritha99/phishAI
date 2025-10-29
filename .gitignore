@@ -31,3 +31,5 @@ Thumbs.db
 outputs/
 =======
 >>>>>>> e75b4356a761689f75a63b396611cdb3c65e28e5
+
+!backend/requirements.txt
