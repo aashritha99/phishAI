@@ -2,6 +2,7 @@ import { useState, useContext, useRef, useEffect } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeContext } from "../components/ThemeContext";
+import { toast } from "react-toastify";
 
 export default function URLChecker() {
   const [url, setUrl] = useState("");
@@ -41,51 +42,42 @@ export default function URLChecker() {
   };
 
   const handleCheck = async () => {
-    if (!url.trim()) {
-      setResult("Please enter a URL to analyze");
-      return;
-    }
+  if (!url.trim()) {
+    toast.error("Please enter a valid URL");
+    return;
+  }
 
-    // Basic URL validation using safe function
-    if (!isValidUrl(url)) {
-      setResult("Please enter a valid URL (include http:// or https://)");
-      return;
-    }
+  setIsLoading(true);
+  setResult("");
+  setAnalysis(null);
 
-    setIsLoading(true);
-    setResult("");
-    setAnalysis(null);
+  try {
+    // ✅ Your local FastAPI backend route
+    const response = await axios.post("http://localhost:8000/predict/url", {
+      url: url,
+    });
 
-    try {
-      // Simulate API call with mock data
-      setTimeout(() => {
-        const isSafe = Math.random() > 0.3; // 70% chance of safe
-        const securityScore = isSafe ? Math.floor(Math.random() * 30) + 70 : Math.floor(Math.random() * 40);
-        
-        const analysisData = {
-          ...mockAnalysis,
-          securityScore: isSafe ? securityScore : Math.floor(Math.random() * 40),
-          trustLevel: isSafe ? Math.floor(Math.random() * 30) + 70 : Math.floor(Math.random() * 30),
-          riskLevel: isSafe ? Math.floor(Math.random() * 20) : Math.floor(Math.random() * 50) + 50,
-          isSafe: isSafe,
-          domain: getDomainFromUrl(url), // Use safe domain extraction
-          analysisTime: new Date().toLocaleTimeString()
-        };
+    const data = response.data;
+    console.log("Backend response:", data);
 
-        setAnalysis(analysisData);
-        setResult(isSafe ? 
-          "✅ This website appears to be SAFE and legitimate" : 
-          "🚨 WARNING: This website may be UNSAFE or suspicious"
-        );
-        setIsLoading(false);
-      }, 2000);
+    const isSafe = data.label?.toLowerCase() === "safe";
 
-    } catch (error) {
-      setResult("Error checking URL");
-      console.error("API Error:", error);
-      setIsLoading(false);
-    }
-  };
+    setResult(
+      isSafe
+        ? "✅ This website appears to be SAFE and legitimate."
+        : "🚨 WARNING: This website may be UNSAFE or suspicious!"
+    );
+
+    toast.success("Analysis complete!");
+  } catch (error) {
+    console.error("API Error:", error);
+    setResult("❌ Error connecting to backend. Please try again.");
+    toast.error("Backend connection failed!");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const clearAll = () => {
     setUrl("");
