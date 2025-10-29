@@ -25,7 +25,6 @@ Thumbs.db
 *.txt
 *.zip
 *.json
-*.pkl
 <<<<<<< HEAD
 # Ignore evaluation outputs
 outputs/
@@ -33,3 +32,6 @@ outputs/
 >>>>>>> e75b4356a761689f75a63b396611cdb3c65e28e5
 
 !backend/requirements.txt
+# Ignore all .pkl files
+*.pkl
+
