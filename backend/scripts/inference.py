@@ -14,7 +14,20 @@ warnings.filterwarnings("ignore", message="X has feature names")
 HF_REPO = "amy45/model"
 
 # ------------------------------
-# Try loading models & assets from Hugging Face
+# Global Lazy Variables
+# ------------------------------
+tfidf_vectorizer = None
+url_scaler = None
+URL_FEATURE_COLUMNS = None
+EMAIL_FEATURE_COLUMNS = None
+
+email_rf_model = None
+email_lr_model = None
+url_rf_model = None
+url_lr_model = None
+
+# ------------------------------
+# Helper: Lazy load from Hugging Face
 # ------------------------------
 def load_from_hf(filename):
     """Download file from Hugging Face and load using joblib."""
@@ -25,21 +38,36 @@ def load_from_hf(filename):
         print(f"⚠️  Failed to load {filename} from HF: {e}")
         return None
 
-print("🚀 Downloading model assets from Hugging Face...")
+# ------------------------------
+# Lazy Model Loader
+# ------------------------------
+def load_models(model_type):
+    global tfidf_vectorizer, url_scaler, URL_FEATURE_COLUMNS, EMAIL_FEATURE_COLUMNS
+    global email_rf_model, email_lr_model, url_rf_model, url_lr_model
 
-# Features & Models
-tfidf_vectorizer = load_from_hf("tfidf_vectorizer.pkl")
-url_scaler = load_from_hf("url_scaler.pkl")
-URL_FEATURE_COLUMNS = load_from_hf("url_feature_columns.pkl")
-# ⚠️ skip email_feature_columns.pkl on purpose (avoid mismatch)
-EMAIL_FEATURE_COLUMNS = None
+    if model_type == "email":
+        if email_rf_model is None or email_lr_model is None:
+            print("📦 Loading Email Models from HF...")
+            tfidf_vectorizer = load_from_hf("tfidf_vectorizer.pkl")
+            # ⚠️ skip EMAIL_FEATURE_COLUMNS if not needed
+            email_rf = load_from_hf("email_rf_model.pkl")
+            email_lr = load_from_hf("email_lr_model.pkl")
+            if email_rf and email_lr:
+                email_rf_model = email_rf
+                email_lr_model = email_lr
+                print("✅ Email models loaded successfully.\n")
 
-email_rf_model = load_from_hf("email_rf_model.pkl")
-email_lr_model = load_from_hf("email_lr_model.pkl")
-url_rf_model = load_from_hf("url_rf_model.pkl")
-url_lr_model = load_from_hf("url_lr_model.pkl")
-
-print("✅ Models & features downloaded from Hugging Face.\n")
+    elif model_type == "url":
+        if url_rf_model is None or url_lr_model is None:
+            print("📦 Loading URL Models from HF...")
+            url_scaler = load_from_hf("url_scaler.pkl")
+            URL_FEATURE_COLUMNS = load_from_hf("url_feature_columns.pkl")
+            url_rf = load_from_hf("url_rf_model.pkl")
+            url_lr = load_from_hf("url_lr_model.pkl")
+            if url_rf and url_lr:
+                url_rf_model = url_rf
+                url_lr_model = url_lr
+                print("✅ URL models loaded successfully.\n")
 
 # ------------------------------
 # Label Map
@@ -51,9 +79,9 @@ LABEL_MAP = {0: "Safe", 1: "Phishing/Malicious"}
 # ------------------------------
 def predict_email(text, model_type="rf"):
     try:
+        load_models("email")  # ✅ load only when needed
         features_df = extract_email_features(text)
 
-        # Only apply column alignment if EMAIL_FEATURE_COLUMNS exists
         if EMAIL_FEATURE_COLUMNS is not None:
             features_df = features_df.reindex(columns=EMAIL_FEATURE_COLUMNS, fill_value=0)
 
@@ -73,6 +101,7 @@ def predict_email(text, model_type="rf"):
 # ------------------------------
 def predict_url(url_string, model_type="rf"):
     try:
+        load_models("url")  # ✅ load only when needed
         df_features = extract_url_features(url_string)
         df_features = df_features.fillna(0)
         df_features = df_features[URL_FEATURE_COLUMNS]
@@ -97,24 +126,23 @@ def predict(input_data, input_type="email"):
     if input_type == "email":
         rf = predict_email(input_data, "rf")
         lr = predict_email(input_data, "lr")
+        return rf if rf["confidence"] >= lr["confidence"] else lr
     elif input_type == "url":
         return predict_url(input_data)
     else:
         raise ValueError("Invalid input_type. Must be 'email' or 'url'.")
 
-    return rf if rf["confidence"] >= lr["confidence"] else lr
-
 # ------------------------------
-# Test Run
+# Test Run (optional)
 # ------------------------------
 if __name__ == "__main__":
     print("\n--- Inference Test Run ---")
 
     email_mal = """Dear Aspirant,
-    You’ve just unlocked access to an exclusive PowerBI Masterclass led by Anjali Pandey (Data Scientist, Accenture) — 
+    You’ve just unlocked access to an exclusive PowerBI Masterclass led by Anjali Pandey (Data Scientist, Accenture) —
     where you’ll learn to build professional dashboards from scratch and earn your verified certificate of completion!
     REGISTER NOW!"""
-    
+
     email_legit = "Meeting Reminder: The team sync-up is scheduled for 2:30 PM today on Google Meet."
 
     print("📧 Email (Malicious):", predict(email_mal, "email"))
