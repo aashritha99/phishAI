@@ -53,7 +53,7 @@ export default function URLChecker() {
 
   try {
     // ✅ Your local FastAPI backend route
-    const response = await axios.post("http://localhost:8000/predict/url", {
+    const response = await axios.post("https://phishai.onrender.com/predict/url", {
       url: url,
     });
 
