@@ -2,6 +2,7 @@ import { useState, useContext, useRef, useEffect } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeContext } from "../components/ThemeContext";
+import { toast } from "react-toastify";
 
 export default function EmailChecker() {
   const [emailText, setEmailText] = useState("");
@@ -24,46 +25,42 @@ export default function EmailChecker() {
   };
 
   const handleCheck = async () => {
-    if (!emailText.trim()) {
-      setResult("Please enter some email content to analyze");
-      return;
-    }
+  if (!emailText.trim()) {
+    toast.error("Please enter email content to analyze");
+    return;
+  }
 
-    setIsLoading(true);
-    setResult("");
-    setAnalysis(null);
+  setIsLoading(true);
+  setResult("");
+  setAnalysis(null);
 
-    try {
-      // Simulate API call with mock data
-      setTimeout(() => {
-        const isSafe = Math.random() > 0.2; // 80% chance of safe
-        const spamScore = isSafe ? Math.floor(Math.random() * 20) : Math.floor(Math.random() * 50) + 50;
-        
-        const analysisData = {
-          ...mockAnalysis,
-          spamScore: isSafe ? spamScore : Math.floor(Math.random() * 50) + 50,
-          readability: isSafe ? Math.floor(Math.random() * 30) + 70 : Math.floor(Math.random() * 50),
-          phishingRisk: isSafe ? Math.floor(Math.random() * 15) : Math.floor(Math.random() * 50) + 50,
-          grammarScore: isSafe ? Math.floor(Math.random() * 20) + 80 : Math.floor(Math.random() * 60),
-          isSafe: isSafe,
-          wordCount: emailText.split(/\s+/).length,
-          analysisTime: new Date().toLocaleTimeString()
-        };
+  try {
+    // ✅ Your local FastAPI backend route (email)
+    const response = await axios.post("http://localhost:8000/predict/email", {
+      email_text: emailText,
+    });
 
-        setAnalysis(analysisData);
-        setResult(isSafe ? 
-          "✅ This email appears to be SAFE and legitimate" : 
-          "🚨 WARNING: This email may be SUSPICIOUS or contain phishing elements"
-        );
-        setIsLoading(false);
-      }, 2000);
+    const data = response.data;
+    console.log("Backend response:", data);
 
-    } catch (error) {
-      setResult("Error checking email content");
-      console.error("API Error:", error);
-      setIsLoading(false);
-    }
-  };
+    const isSafe = data.label?.toLowerCase() === "safe";
+
+    setResult(
+      isSafe
+        ? "✅ This email appears to be SAFE and legitimate."
+        : "🚨 WARNING: This email may be SUSPICIOUS or contain phishing content!"
+    );
+
+    toast.success("Analysis complete!");
+  } catch (error) {
+    console.error("API Error:", error);
+    setResult("❌ Error connecting to backend. Please try again.");
+    toast.error("Backend connection failed!");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const clearAll = () => {
     setEmailText("");
