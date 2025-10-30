@@ -15,6 +15,6 @@ app.add_middleware(
 
 app.include_router(predict_router, prefix="/predict", tags=["Predict"])
 
-@app.get("/")
-def root():
-    return {"Message ": "Welcome to the PishAI Backend! Use the /predict endpoint to classify emails and URLs."}
+@app.api_route("/", methods=["GET", "HEAD"])
+async def root():
+    return {"message": "Welcome to the PishAI Backend! Use the /predict endpoint to classify emails and URLs."}
