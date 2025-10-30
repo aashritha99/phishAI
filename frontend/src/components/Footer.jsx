@@ -52,12 +52,6 @@ export default function Footer() {
               📧 Email Checker
             </a>
             <a
-              href="/history"
-              className="hover:text-blue-500 transition-colors text-sm"
-            >
-              📜 Scan History
-            </a>
-            <a
               href="/about"
               className="hover:text-blue-500 transition-colors text-sm"
             >

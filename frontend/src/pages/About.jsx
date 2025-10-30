@@ -95,7 +95,7 @@ function About() {
       emoji: "🎨"
     },
     {
-      name: "AI Engineer",
+      name: "AI Security Engineer",
       person:"Sneha Sah",
       role: "Backend & ML Developer",
       description: "Building intelligent phishing detection systems with advanced machine learning",

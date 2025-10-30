@@ -62,11 +62,51 @@ export default function URLChecker() {
 
     const isSafe = data.label?.toLowerCase() === "safe";
 
-    setResult(
-      isSafe
-        ? "✅ This website appears to be SAFE and legitimate."
-        : "🚨 WARNING: This website may be UNSAFE or suspicious!"
-    );
+    const score = isSafe ? data.confidence : 100 - data.confidence;
+
+      setResult(
+        isSafe
+          ? "✅ This website appears to be SAFE and legitimate."
+          : "🚨 WARNING: This website may be UNSAFE or suspicious!"
+      );
+      let threats = [];
+      let recommendations = [];
+      if (score <= 30) {
+        threats = [
+          "⚠ Critical Alert: This website exhibits strong signs of phishing or malicious intent. Avoid entering any credentials or downloading files.",
+        ];
+        recommendations = [
+          "🚫 Do not proceed. Close this site immediately and consider scanning your device for malware.",
+        ];
+      } else if (score <= 50) {
+        threats = [
+          "⚠ Warning: The website shows multiple suspicious indicators like unsafe redirects or an invalid certificate.",
+        ];
+        recommendations = [
+          "⚠ Proceed only if absolutely necessary. Avoid logging in or providing sensitive details.",
+        ];
+      } else if (score <= 80) {
+        threats = [
+          "🟡 Moderate Risk: The site seems mostly safe but includes some unusual behavior, possibly due to a new domain or external tracking.",
+        ];
+        recommendations = [
+          "🔍 Double-check the URL spelling and SSL certificate before trusting the site.",
+        ];
+      } else {
+        threats = [
+          "🟢 Secure: The website appears legitimate and secure with no major risk factors detected.",
+        ];
+        recommendations = [
+          "✅ You can safely continue browsing, but always remain alert for pop-ups or unexpected downloads.",
+        ];
+      }
+      setAnalysis({
+        securityScore: isSafe ? data.confidence : 100 - data.confidence,
+        riskLevel: isSafe ? 100 - data.confidence : data.confidence,
+        threats: threats,
+        isSafe,
+        recommendations: recommendations,
+      });
 
     toast.success("Analysis complete!");
   } catch (error) {
