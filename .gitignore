@@ -35,3 +35,4 @@ outputs/
 # Ignore all .pkl files
 *.pkl
 
+!dataset/features/url_feature_columns.pkl
