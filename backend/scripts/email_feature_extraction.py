@@ -13,6 +13,9 @@ FEATURES_DIR = os.path.join(PROJECT_ROOT, "dataset", "features")
 TFIDF_PATH = os.path.join(FEATURES_DIR, "tfidf_vectorizer.pkl")
 tfidf_vectorizer = joblib.load(TFIDF_PATH)
 
+print("TFIDF_PATH:", TFIDF_PATH)
+print("Exists:", os.path.exists(TFIDF_PATH))
+
 def clean_email_text(text: str) -> str:
     if not isinstance(text, str):
         text = str(text)
