@@ -1,0 +1,41 @@
+# -----------------------------
+# Stage 1: Base Python environment
+# -----------------------------
+FROM python:3.11-slim
+
+
+# Set working directory inside container
+WORKDIR /app
+
+# Install system dependencies (optional, depends on your libs)
+RUN apt-get update && apt-get install -y build-essential
+
+# -----------------------------
+# Stage 2: Copy and install dependencies
+# -----------------------------
+# Copy only the backend requirements first (for caching)
+COPY backend/requirements.txt ./requirements.txt
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+# -----------------------------
+# Stage 3: Copy app code + dataset
+# -----------------------------
+# Copy your backend code
+COPY backend/ ./backend/
+
+# Copy dataset features (relative to project root)
+COPY dataset/features ./dataset/features/
+
+# -----------------------------
+# Stage 4: Expose & Run
+# -----------------------------
+# Expose the Flask port
+EXPOSE 8000
+
+# Set working directory to backend
+WORKDIR /app/backend
+
+# Command to start Flask using Gunicorn (production-ready)
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
