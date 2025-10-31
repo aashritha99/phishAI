@@ -36,7 +36,7 @@ export default function EmailChecker() {
 
   try {
     // ✅ Your local FastAPI backend route (email)
-    const response = await axios.post("http://localhost:8000/predict/email", {
+    const response = await axios.post("https://phishai.onrender.com/predict/email", {
       email_text: emailText,
     });
 
