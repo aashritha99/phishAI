@@ -57,16 +57,36 @@ export default function URLChecker() {
     });
 
     const data = response.data;
-    console.log("Backend response:", data);
-
     const isSafe = data.label?.toLowerCase() === "safe";
     const confidence = Number(data.confidence) || 0;
 
-    // 🟩 Calculate trust level properly
-    const trustLevel = isSafe ? confidence : 100 - confidence;
+    const securityScore = confidence;
 
-    // 🟩 Risk level inverse of trust level
+    let trustLevel;
+    if (isSafe) {
+      trustLevel = Math.min(100, confidence + (100 - confidence) * 0.15);
+    } else {
+      trustLevel = Math.max(0, confidence - confidence * 0.25);
+    }
+
     const riskLevel = 100 - trustLevel;
+
+    let threats = [];
+    let recommendations = [];
+
+    if (riskLevel >= 75) {
+      threats = ["⚠ Critical Alert: This website exhibits strong signs of phishing or malicious activity."];
+      recommendations = ["🚫 Do not proceed. Close the tab and avoid entering any credentials."];
+    } else if (riskLevel >= 50) {
+      threats = ["⚠ Warning: Multiple suspicious indicators detected (redirects, invalid SSL, or mismatched domain)."];
+      recommendations = ["⚠ Avoid logging in or downloading anything from this site."];
+    } else if (riskLevel >= 25) {
+      threats = ["🟡 Moderate Risk: Slightly unusual domain or external tracker detected."];
+      recommendations = ["🔍 Verify the domain spelling and SSL certificate before proceeding."];
+    } else {
+      threats = ["🟢 Secure: The website appears legitimate and poses minimal risk."];
+      recommendations = ["✅ Continue browsing safely but stay cautious about pop-ups or redirects."];
+    }
 
     setResult(
       isSafe
@@ -74,47 +94,13 @@ export default function URLChecker() {
         : "🚨 WARNING: This website may be UNSAFE or suspicious!"
     );
 
-    let threats = [];
-    let recommendations = [];
-
-    if (trustLevel <= 30) {
-      threats = [
-        "⚠ Critical Alert: This website exhibits strong signs of phishing or malicious intent. Avoid entering any credentials or downloading files.",
-      ];
-      recommendations = [
-        "🚫 Do not proceed. Close this site immediately and consider scanning your device for malware.",
-      ];
-    } else if (trustLevel <= 50) {
-      threats = [
-        "⚠ Warning: The website shows multiple suspicious indicators like unsafe redirects or an invalid certificate.",
-      ];
-      recommendations = [
-        "⚠ Proceed only if absolutely necessary. Avoid logging in or providing sensitive details.",
-      ];
-    } else if (trustLevel <= 80) {
-      threats = [
-        "🟡 Moderate Risk: The site seems mostly safe but includes some unusual behavior, possibly due to a new domain or external tracking.",
-      ];
-      recommendations = [
-        "🔍 Double-check the URL spelling and SSL certificate before trusting the site.",
-      ];
-    } else {
-      threats = [
-        "🟢 Secure: The website appears legitimate and secure with no major risk factors detected.",
-      ];
-      recommendations = [
-        "✅ You can safely continue browsing, but always remain alert for pop-ups or unexpected downloads.",
-      ];
-    }
-
-    // 🟩 Added trustLevel in state
     setAnalysis({
-      securityScore: confidence,
-      trustLevel: trustLevel,
-      riskLevel: riskLevel,
-      threats: threats,
+      securityScore: Math.round(securityScore),
+      trustLevel: Math.round(trustLevel),
+      riskLevel: Math.round(riskLevel),
       isSafe,
-      recommendations: recommendations,
+      threats,
+      recommendations,
     });
 
     toast.success("Analysis complete!");
