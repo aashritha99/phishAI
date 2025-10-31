@@ -37,3 +37,4 @@ outputs/
 
 !dataset/features/url_feature_columns.pkl
 !backend/startup.txt
+!frontend/vercel.json
