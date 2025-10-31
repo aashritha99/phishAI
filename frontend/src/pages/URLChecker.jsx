@@ -53,7 +53,7 @@ export default function URLChecker() {
 
   try {
     // ✅ Your local FastAPI backend route
-    const response = await axios.post("https://phishai.onrender.com/predict/url", {
+    const response = await axios.post("https://phishaiapi.azurewebsites.net/predict/url", {
       url: url,
     });
 
@@ -329,7 +329,7 @@ export default function URLChecker() {
         </motion.div>
 
         {/* Main Scanner Card */}
-        <Card3D className="mb-8">
+        <div className="mb-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -424,7 +424,7 @@ export default function URLChecker() {
               )}
             </motion.button>
           </motion.div>
-        </Card3D>
+        </div>
 
         {/* Results Section */}
         <AnimatePresence>
@@ -437,7 +437,7 @@ export default function URLChecker() {
               className="space-y-6"
             >
               {/* Safety Status Card */}
-              <Card3D>
+              {/*</Card3D>*/}
                 <motion.div
                   initial={{ scale: 0.9 }}
                   animate={{ scale: 1 }}
@@ -568,7 +568,7 @@ export default function URLChecker() {
                     </div>
                   </motion.div>
                 </motion.div>
-              </Card3D>
+              {/*</Card3D>*/}
 
               {/* Action Buttons */}
               <motion.div
@@ -607,7 +607,7 @@ export default function URLChecker() {
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
             >
-              <Card3D>
+              {/*</Card3D>*/}
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -665,7 +665,7 @@ export default function URLChecker() {
                     ))}
                   </motion.div>
                 </motion.div>
-              </Card3D>
+              {/*</Card3D>*/}
             </motion.div>
           )}
         </AnimatePresence>

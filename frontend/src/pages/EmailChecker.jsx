@@ -35,21 +35,106 @@ export default function EmailChecker() {
   setAnalysis(null);
 
   try {
-    // ✅ Your local FastAPI backend route (email)
-    const response = await axios.post("https://phishai.onrender.com/predict/email", {
+    const response = await axios.post("https://phishaiapi.azurewebsites.net/predict/email", {
       email_text: emailText,
     });
 
     const data = response.data;
     console.log("Backend response:", data);
 
-    const isSafe = data.label?.toLowerCase() === "safe";
+    const status = data.status?.toLowerCase() || "unknown";
+    const label = data.label?.toLowerCase() || "unknown";
+    const confidence = parseFloat(data.confidence || 0);
+
+    const isSafe = label === "safe" || label === "legitimate";
 
     setResult(
       isSafe
         ? "✅ This email appears to be SAFE and legitimate."
-        : "🚨 WARNING: This email may be SUSPICIOUS or contain phishing content!"
+        : "🚨 WARNING: This email may be PHISHING or MALICIOUS!"
     );
+
+    let spamScore, readability, phishingRisk, grammarScore, sentiment;
+    let threats = [];
+    let recommendations = [];
+    let keywords = [];
+
+    if (!isSafe && confidence >= 85) {
+      spamScore = 90;
+      readability = 40;
+      phishingRisk = 95;
+      grammarScore = 45;
+      sentiment = "negative";
+      threats = [
+        "⚠ Critical Alert: This email strongly resembles phishing or scam content.",
+        "🚫 Do not click any links or download attachments.",
+      ];
+      recommendations = [
+        "❌ Delete the email immediately.",
+        "🔒 Do not share any personal information or credentials.",
+      ];
+      keywords = ["urgent", "verify", "account", "password"];
+    } else if (!isSafe && confidence >= 60) {
+      spamScore = 70;
+      readability = 60;
+      phishingRisk = 65;
+      grammarScore = 70;
+      sentiment = "neutral-negative";
+      threats = [
+        "🟠 High Risk: The email shows suspicious sender info or fake links.",
+        "⚠ Contains possible impersonation or verification requests.",
+      ];
+      recommendations = [
+        "⚠ Verify sender identity before responding.",
+        "🚫 Avoid entering credentials on linked pages.",
+      ];
+      keywords = ["update", "security", "login"];
+    } else if (isSafe && confidence < 80) {
+      spamScore = 30;
+      readability = 75;
+      phishingRisk = 25;
+      grammarScore = 85;
+      sentiment = "neutral-positive";
+      threats = [
+        "🟡 Moderate Risk: Email seems fine but contains marketing-like or automated content.",
+      ];
+      recommendations = [
+        "🔍 Double-check links before clicking.",
+        "💬 Looks safe but stay alert for unexpected requests.",
+      ];
+      keywords = ["offer", "newsletter", "reminder"];
+    } else {
+      spamScore = 15;
+      readability = 90;
+      phishingRisk = 10;
+      grammarScore = 92;
+      sentiment = "positive";
+      threats = [
+        "🟢 Secure: No phishing indicators found.",
+        "✅ Good grammar and no suspicious links.",
+      ];
+      recommendations = [
+        "💬 Email appears safe to send or respond to.",
+        "💡 Consider adding more personalization.",
+      ];
+      keywords = ["professional", "clear", "friendly"];
+    }
+
+    setAnalysis({
+      status,
+      label,
+      confidence,
+      spamScore,
+      readability,
+      phishingRisk,
+      grammarScore,
+      sentiment,
+      threats,
+      recommendations,
+      keywords,
+      isSafe,
+    });
+
 
     toast.success("Analysis complete!");
   } catch (error) {
@@ -68,7 +153,6 @@ export default function EmailChecker() {
     setAnalysis(null);
   };
 
-  // Theme-based styles with purple theme
   const themeStyles = {
     light: {
       background: "bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100",
@@ -298,7 +382,7 @@ export default function EmailChecker() {
         </motion.div>
 
         {/* Main Analyzer Card */}
-        <Card3D className="mb-8">
+        <div className="mb-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -392,7 +476,7 @@ export default function EmailChecker() {
               )}
             </motion.button>
           </motion.div>
-        </Card3D>
+        </div>
 
         {/* Results Section */}
         <AnimatePresence>
@@ -405,7 +489,7 @@ export default function EmailChecker() {
               className="space-y-6"
             >
               {/* Safety Status Card */}
-              <Card3D>
+              {/*</Card3D>*/}
                 <motion.div
                   initial={{ scale: 0.9 }}
                   animate={{ scale: 1 }}
@@ -572,7 +656,7 @@ export default function EmailChecker() {
                     </div>
                   </motion.div>
                 </motion.div>
-              </Card3D>
+              {/*</Card3D>*/}
 
               {/* Action Buttons */}
               <motion.div
@@ -611,7 +695,7 @@ export default function EmailChecker() {
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
             >
-              <Card3D>
+              {/*</Card3D>*/}
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -666,7 +750,7 @@ export default function EmailChecker() {
                     ))}
                   </motion.div>
                 </motion.div>
-              </Card3D>
+              {/*</Card3D>*/}
             </motion.div>
           )}
         </AnimatePresence>
