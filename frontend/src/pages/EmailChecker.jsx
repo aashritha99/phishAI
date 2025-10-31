@@ -500,7 +500,7 @@ export default function EmailChecker() {
                   }`}
                   style={{ transform: 'translateZ(30px)' }}
                 >
-                  <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center justify-between  gap-4 mb-6">
                     <h3 className={`text-3xl font-bold ${currentTheme.text.primary} flex items-center gap-4`}>
                       <SafetyIndicator isSafe={analysis?.isSafe} size="large" />
                       Security Status
