@@ -60,7 +60,10 @@ export default function URLChecker() {
     const isSafe = data.label?.toLowerCase() === "safe";
     const confidence = Number(data.confidence) || 0;
 
-    const securityScore = confidence;
+    const securityScore = isSafe
+  ? 60 + confidence * 0.3 // safe → 70–100 range
+  : 40 - confidence * 0.3; // unsafe → 0–30 range
+
 
     let trustLevel;
     if (isSafe) {
