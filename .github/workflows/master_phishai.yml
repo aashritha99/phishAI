@@ -1,0 +1,69 @@
+name: Build and deploy Python app to Azure Web App - phishai
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies from backend folder
+        run: |
+          cd backend
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-app
+          path: |
+            backend/
+            models/
+            datasets/
+            !backend/venv/
+            !backend/__pycache__/
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: python-app
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_EDF4D2FCBB124BBD8F4F0F29557034A1 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_5D5EF3037367409E86C3179E0EA9818C }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E25D457981B940CD8CB5BE156279A1F5 }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        id: deploy-to-webapp
+        with:
+          app-name: 'phishai'
+          slot-name: 'Production'
+          package: './backend'
