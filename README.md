@@ -42,7 +42,7 @@ It inspects the content, structure, and metadata of emails to identify potential
 | Layer | Technologies |
 |-------|---------------|
 | **Frontend** | React.js, Tailwind CSS, Axios, Framer Motion |
-| **Backend** | FastAPI / Flask, Python, scikit-learn, pandas, NumPy |
+| **Backend** | FastAPI , Python, scikit-learn, pandas, NumPy |
 | **Machine Learning** | Logistic Regression, Random Forest, TF-IDF, CountVectorizer |
 
 ---
