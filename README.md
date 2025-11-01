@@ -66,14 +66,15 @@ cd frontend
 npm install
 npm run dev
 ```
+---
 Now open 👉 http://localhost:5173 in your browser.
 
-### 📚 Model Training
+## 📚 Model Training
+
 PhishAI’s ML models were trained on a labeled dataset of phishing and legitimate emails.
 Features were extracted from email text, URLs, and headers using NLP and preprocessing pipelines.
 Models are serialized as .pkl files and stored in the models/ directory for real-time inference.
-
-### 📂 Project Structure
+## 📂 Project Structure
 ```
 PHISHAI/
 │
@@ -94,8 +95,8 @@ PHISHAI/
 ├── Dockerfile
 └── README.md
 ```
-
-### 👩‍💻 Contributors
+---
+## 👩‍💻 Contributors
 ```
 | Name          | Role                    | Contribution                                                    |
 | ------------- | ----------------------- | --------------------------------------------------------------- |
@@ -103,18 +104,21 @@ PHISHAI/
 | Aashritha     | UI Developer            | Designed and developed the frontend user interface              |
 
 ```
-### 📸 Screenshots
+---
+## 📸 Screenshots
 
 <img width="1452" height="855" alt="image" src="https://github.com/user-attachments/assets/95b100b5-9bca-4674-aeac-890e52a10740" />
 <img width="1040" height="870" alt="image" src="https://github.com/user-attachments/assets/df55715b-e195-4ff3-a7da-ccc1d2c96221" />
 <img width="1066" height="914" alt="image" src="https://github.com/user-attachments/assets/11d998ff-71c4-4414-bbaf-20a467bc5095" />
 
+---
 
-### 📜 License
+📜 License
+---
 This project is licensed under the MIT License.
 Feel free to use and modify it for learning or research purposes.
 
-### ⭐ Support
+## ⭐ Support
 If you found PhishAI helpful or inspiring, please consider giving it a ⭐ on GitHub!
 Together, let's spread awareness about phishing detection through AI 🤖💡
 
